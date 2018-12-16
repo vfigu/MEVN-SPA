@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>{{ msg }}</h1>
+    <app-nav></app-nav>
     <h2>Essential Links</h2>
     <ul>
       <li>
@@ -84,11 +84,14 @@
 </template>
 
 <script>
+import AppNav from '@/components/Nav'
+
 export default {
   name: 'Home',
+  components: {AppNav},
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      username: 'Welcome to Your MEVN App'
     }
   }
 }
