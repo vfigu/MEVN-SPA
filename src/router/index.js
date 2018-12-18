@@ -36,6 +36,11 @@ export default new Router({
       component: Home
     },
     {
+      path: '*',
+      name: '/',
+      component: Home
+    },
+    {
       path: '/signup',
       name: 'SignUp',
       component: SignUp,
@@ -54,7 +59,7 @@ export default new Router({
     },
     {
       path: '*',
-      name: 'Wildcard',
+      name: '/',
       component: Home
     }
   ]

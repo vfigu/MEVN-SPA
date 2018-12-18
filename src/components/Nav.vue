@@ -18,7 +18,7 @@
       <ul class="navbar-nav mr-auto">
         <li v-if="loggedIn()" class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href=""
-             id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Welcome User</a>
+             id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Welcome {{Name}}</a>
           <div class="text-center dropdown-menu btn btn-danger fa fa-sign-out" @click="logout()">Log out</div>
         </li>
       </ul>
@@ -43,8 +43,14 @@ export default {
   log: false,
   data () {
     return {
+      Name: '',
       username: '',
       password: ''
+    }
+  },
+  created () {
+    if (this.loggedIn()) {
+      this.Name = auth.getName()
     }
   },
   methods: {
@@ -52,14 +58,14 @@ export default {
       credentials.username = this.username
       credentials.password = this.password
 
-      auth.login(credentials)
+      auth.login(credentials, '/users')
       this.$forceUpdate()
     },
     loggedIn () {
       return auth.loggedIn()
     },
     logout () {
-      auth.logout()
+      auth.logout('/home')
       this.$forceUpdate()
     }
   }
