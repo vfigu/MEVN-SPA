@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import axios from '../services/axios'
+import auth from '../services/auth'
 import credentials from '../models/credentials'
 
 export default {
@@ -59,12 +59,9 @@ export default {
     },
     register () {
       if (this.password === this.confirm_password) {
-        let url = 'http://localhost:3000/api/auth/register'
         credentials.username = this.username
         credentials.password = this.password
-        axios.post(url, credentials)
-          .then(() => this.$router.push('/'))
-          .catch(err => console.log(err))
+        auth.signup(credentials)
       }
     }
   }

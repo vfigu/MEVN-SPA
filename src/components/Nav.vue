@@ -28,8 +28,7 @@
                placeholder="Username" name="Username" v-model="username">
         <input class="form-control mr-sm-2 col-md-4 col-sm-4" type="password" required
                placeholder="Password" name="Password" v-model="password">
-        <button class="btn btn-success my-2 my-sm-0 col-md-2 col-sm-2 fa fa-sign-in" @click="login()">Login</button>
-
+        <div class="btn btn-success my-2" @click="login()">Login</div>
       </form>
     </div>
   </nav>

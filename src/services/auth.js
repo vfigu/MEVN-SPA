@@ -5,7 +5,6 @@ const LOGIN_URL = API_URL + 'api/auth/login'
 const REGISTER_URL = API_URL + 'register/'
 
 export default {
-
   login (credentials, success, fail) {
     axios.post(LOGIN_URL, credentials)
       .then(
@@ -15,14 +14,17 @@ export default {
           }
         }
       )
+      .then(() => {
+        this.$router.push('/users')
+      })
       .catch(
         err => {
           console.log(err)
         })
   },
 
-  signup (context, credentials, redirect) {
-    context.$http.post(REGISTER_URL, credentials, (data) => {
+  signup (credentials, redirect) {
+    axios.post(REGISTER_URL, credentials, (data) => {
       localStorage.setItem('token', data.token)
 
       if (redirect) {
@@ -33,7 +35,6 @@ export default {
 
   logout () {
     localStorage.removeItem('token')
-    console.log(localStorage.getItem('token'))
   },
 
   loggedIn () {
