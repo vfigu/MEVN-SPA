@@ -7,7 +7,7 @@
             <router-link to="/" class="nav-link">Home</router-link>
           </li>
           <li v-if="loggedIn()" class="nav-item">
-            <router-link to="/users" class="nav-link">Users</router-link>
+            <router-link to="/user" class="nav-link">Users</router-link>
           </li>
           <li v-if="!loggedIn()" class="nav-item">
             <router-link to="/signup" class="nav-link">Sign Up</router-link>
@@ -49,7 +49,7 @@ export default {
     }
   },
   created () {
-    if (this.loggedIn()) {
+    if (auth.loggedIn()) {
       this.Name = auth.getName()
     }
   },
@@ -58,7 +58,7 @@ export default {
       credentials.username = this.username
       credentials.password = this.password
 
-      auth.login(credentials, '/users')
+      auth.login(credentials, '/user')
       this.$forceUpdate()
     },
     loggedIn () {

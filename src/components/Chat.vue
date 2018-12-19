@@ -1,8 +1,7 @@
 <template>
-  <div class="chat-box">
+  <div v-if="userExists" class="chat-box">
     <app-nav></app-nav>
-
-    <div class="container-fluid h-100">
+    <div class="container-fluid mt-4">
       <div class="row justify-content-center h-100">
         <div class="col-md-8 col-xl-6 chat">
           <div class="card">
@@ -11,96 +10,47 @@
                 <div class="img_cont">
                   <img src="../assets/user.png" class="rounded-circle user_img">
                 </div>
-                <div class="">
-                  <h4>Chat with User</h4>
+                <div class="mt-3 ml-4">
+                  <h2>{{target}}</h2>
                 </div>
-                <div class="video_cam">
-                  <span><i class="fas fa-video"></i></span>
-                  <span><i class="fas fa-phone"></i></span>
-                </div>
-              </div>
-              <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
-              <div class="action_menu">
-                <ul>
-                  <li><i class="fas fa-user-circle"></i> View profile</li>
-                  <li><i class="fas fa-users"></i> Add to close friends</li>
-                  <li><i class="fas fa-plus"></i> Add to group</li>
-                  <li><i class="fas fa-ban"></i> Block</li>
-                </ul>
               </div>
             </div>
+
             <div class="card-body msg_card_body">
-              <div class="d-flex justify-content-start mb-4">
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
+              <div v-for="message in messages" :key="message._id" ref="container">
+                <!--Left side-->
+                <div v-if="(message.username !== username) && (message.room === room)" class="d-flex justify-content-start mb-4">
+                  <div class="img_cont_msg">
+                    <img src="../assets/user.png" class="rounded-circle user_img_msg">
+                    <h6 class="mt-2" style="font-size: 60%">{{message.username}}</h6>
+                  </div>
+                  <div class="msg_cotainer">
+                    {{message.message}}
+                    <span class="msg_time ml-2">{{formatTime(message.date_created)}}</span>
+                  </div>
                 </div>
-                <div class="msg_cotainer">
-                  Hi, how are you samim?
-                  <span class="msg_time">8:40 AM, Today</span>
-                </div>
-              </div>
-              <div class="d-flex justify-content-end mb-4">
-                <div class="msg_cotainer_send">
-                  Hi Maryam i am good tnx how about you?
-                  <span class="msg_time_send">8:55 AM, Today</span>
-                </div>
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-              </div>
-              <div class="d-flex justify-content-start mb-4">
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-                <div class="msg_cotainer">
-                  I am good too, thank you for your chat template
-                  <span class="msg_time">9:00 AM, Today</span>
-                </div>
-              </div>
-              <div class="d-flex justify-content-end mb-4">
-                <div class="msg_cotainer_send">
-                  You welcome Maryam
-                  <span class="msg_time_send">9:05 AM, Today</span>
-                </div>
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-              </div>
-              <div class="d-flex justify-content-start mb-4">
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-                <div class="msg_cotainer">
-                  I am looking for your next templates
-                  <span class="msg_time">9:07 AM, Today</span>
-                </div>
-              </div>
-              <div class="d-flex justify-content-end mb-4">
-                <div class="msg_cotainer_send">
-                  Ok, thank you have a good day
-                  <span class="msg_time_send">9:10 AM, Today</span>
-                </div>
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-              </div>
-              <div class="d-flex justify-content-start mb-4">
-                <div class="img_cont_msg">
-                  <img src="../assets/user.png" class="rounded-circle user_img_msg">
-                </div>
-                <div class="msg_cotainer">
-                  Bye, see you
-                  <span class="msg_time">9:12 AM, Today</span>
+
+                <!--Right side-->
+                <div v-if="(message.username === username) && (message.room === room)" class="d-flex justify-content-end mb-4">
+                  <div class="msg_cotainer_send">
+                    {{message.message}}
+                    <span class="msg_time_send mr-2">{{formatTime(message.date_created)}}</span>
+                  </div>
+                  <div class="img_cont_msg">
+                    <img src="../assets/user.png" class="rounded-circle user_img_msg">
+                    <h6 class="mt-2" style="font-size: 60%">You</h6>
+                  </div>
                 </div>
               </div>
             </div>
+
             <div class="card-footer">
-              <div class="input-group">
-                <textarea name="" class="form-control type_msg" placeholder="Type your message..."></textarea>
+              <form class="input-group">
+                <textarea name="" class="form-control" v-model="message" placeholder="Type your message..."></textarea>
                 <div class="input-group-append">
-                  <span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
+                  <span class="input-group-text send_btn" @click="sendMessage()">Send</span>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -108,8 +58,11 @@
     </div>
   </div>
 </template>
-
 <script>
+// import * as io from 'socket.io-client'
+import axios from '../services/axios'
+import auth from '../services/auth'
+import msg from '../models/messages'
 import AppNav from '@/components/Nav'
 
 export default {
@@ -117,7 +70,77 @@ export default {
   components: {AppNav},
   data () {
     return {
-      username: 'Chat with User'
+      userExists: false,
+      target: '',
+      username: '',
+      message: '',
+      messages: [],
+      room: ''
+    }
+  },
+  created () {
+    if (auth.loggedIn()) {
+      this.username = auth.getName()
+    }
+    this.getProfileName()
+    this.getMessages()
+
+    // let socket = io.connect('http://localhost:8000/')
+    //
+    // socket.on('fromServer', function (data) { // listen for fromServer message
+    //   console.log('Connected to Server on Port ' + data.id)
+    //   socket.emit('fromClient', {id: this.username}) // send fromClient message to server
+    // })
+    //
+    // socket.on('Handshake', function () { // listen for fromServer message
+    //   setTimeout(function () {
+    //     socket.emit('Handshake')
+    //   }, 2500)
+    // })
+    // socket.on('disconnect', function () {
+    //   console.log('Server disconnected')
+    // })
+  },
+  methods: {
+    sendMessage () {
+      let url = 'http://localhost:3000/api/chat/'
+      msg.room = this.room
+      msg.username = this.username
+      msg.message = this.message
+      this.axios.post(url, msg).then(() => {
+        this.message = ''
+        this.getMessages()
+      })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    getProfileName () {
+      let url = 'http://localhost:3000/api' + this.$route.path
+      this.room = this.$route.path.substring(6)
+      this.axios.get(url).then(response => {
+        this.target = response.data.username
+        this.userExists = true
+      })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    getMessages () {
+      let url = 'http://localhost:3000/api/chat/'
+      let req = {'username': 'jill'}
+      axios.get(url, JSON.stringify(req))
+        .then(response => {
+          this.messages = response.data
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+    formatTime (date) {
+      let time = new Date(date)
+      return time.toLocaleTimeString()
     }
   }
 }
@@ -140,13 +163,9 @@ export default {
     height: 100%;
     border-radius: 15px !important;
   }
-  .contacts_body{
-    padding:  0.75rem 0 !important;
-    overflow-y: auto;
-    white-space: nowrap;
-  }
   .msg_card_body{
     overflow-y: auto;
+    max-height: 400px;
   }
   .card-header{
     border-radius: 15px 15px 0 0 !important;
@@ -156,29 +175,6 @@ export default {
     border-radius: 0 0 15px 15px !important;
     border-top: 0 !important;
   }
-  .container{
-    align-content: center;
-  }
-  .search{
-    border-radius: 15px 0 0 15px !important;
-    background-color: rgba(0,0,0,0.3) !important;
-    border:0 !important;
-    color:white !important;
-  }
-  .search:focus{
-    box-shadow:none !important;
-    outline:0px !important;
-  }
-  .type_msg{
-    border:0 !important;
-    color:white !important;
-    height: 60px !important;
-    overflow-y: auto;
-  }
-  .type_msg:focus{
-    box-shadow:none !important;
-    outline:0px !important;
-  }
   .send_btn{
     border-radius: 0 15px 15px 0 !important;
     background-color: #78e08f !important;
@@ -186,17 +182,10 @@ export default {
     color: white !important;
     cursor: pointer;
   }
-  .contacts{
-    list-style: none;
-    padding: 0;
-  }
   .contacts li{
     width: 100% !important;
     padding: 5px 10px;
     margin-bottom: 15px !important;
-  }
-  .active{
-    background-color: rgba(0,0,0,0.3);
   }
   .user_img{
     height: 70px;
@@ -207,7 +196,7 @@ export default {
   .user_img_msg{
     height: 40px;
     width: 40px;
-    border:1.5px solid #f5f6fa;
+    border: 2px solid #f5f6fa;
 
   }
   .img_cont{
@@ -219,24 +208,6 @@ export default {
     height: 40px;
     width: 40px;
   }
-  .online_icon{
-    position: absolute;
-    height: 15px;
-    width:15px;
-    background-color: #4cd137;
-    border-radius: 50%;
-    bottom: 0.2em;
-    right: 0.4em;
-    border:1.5px solid white;
-  }
-  .offline{
-    background-color: #c23616 !important;
-  }
-  .user_info{
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-left: 15px;
-  }
   .user_info span{
     font-size: 20px;
     color: white;
@@ -244,10 +215,6 @@ export default {
   .user_info p{
     font-size: 10px;
     color: rgba(255,255,255,0.6);
-  }
-  .video_cam{
-    margin-left: 50px;
-    margin-top: 5px;
   }
   .video_cam span{
     color: white;
@@ -261,8 +228,11 @@ export default {
     margin-left: 10px;
     border-radius: 25px;
     background-color: #82ccdd;
-    padding: 10px;
+    padding: 10px 20px;
     position: relative;
+    min-width: 75px;
+    min-height: 41px;
+    text-align: left;
   }
   .msg_cotainer_send{
     margin-top: auto;
@@ -270,44 +240,26 @@ export default {
     margin-right: 10px;
     border-radius: 25px;
     background-color: #78e08f;
-    padding: 10px;
+    padding: 10px 20px;
     position: relative;
+    min-width: 75px;
+    min-height: 41px;
+    text-align: right;
   }
   .msg_time{
     position: absolute;
     left: 0;
     bottom: -15px;
-    color: rgba(255,255,255,0.5);
     font-size: 10px;
   }
   .msg_time_send{
     position: absolute;
-    right:0;
+    right: 0;
     bottom: -15px;
-    color: rgba(255,255,255,0.5);
     font-size: 10px;
   }
   .msg_head{
     position: relative;
-  }
-  #action_menu_btn{
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    color: white;
-    cursor: pointer;
-    font-size: 20px;
-  }
-  .action_menu{
-    z-index: 1;
-    position: absolute;
-    padding: 15px 0;
-    background-color: rgba(0,0,0,0.5);
-    color: white;
-    border-radius: 15px;
-    top: 30px;
-    right: 15px;
-    display: none;
   }
   .action_menu ul{
     list-style: none;
@@ -326,10 +278,5 @@ export default {
   .action_menu ul li:hover{
     cursor: pointer;
     background-color: rgba(0,0,0,0.2);
-  }
-  @media(max-width: 576px){
-    .contacts_card{
-      margin-bottom: 15px !important;
-    }
   }
 </style>

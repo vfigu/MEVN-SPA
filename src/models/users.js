@@ -1,5 +1,5 @@
 let users = {
-  username: { type: String, required: true, index: {unique: true} },
+  username: { type: String, required: true },
   password: { type: String, required: true },
   url: String,
   date_created: {

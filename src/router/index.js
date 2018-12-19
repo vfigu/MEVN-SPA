@@ -47,19 +47,19 @@ export default new Router({
       beforeEnter: ifNotAuthenticated
     },
     {
-      path: '/users',
+      path: '/user',
       name: 'Users',
       component: Users,
       beforeEnter: ifAuthenticated
     },
     {
-      path: '/users/:id',
+      path: '/user/:id',
       name: 'Chat',
       component: Chat
     },
     {
       path: '*',
-      name: '/',
+      name: 'Wildcard',
       component: Home
     }
   ]

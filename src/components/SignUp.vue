@@ -62,6 +62,7 @@ export default {
         credentials.username = this.username
         credentials.password = this.password
         auth.signup(credentials)
+        this.$router.push('/')
       }
     }
   }
